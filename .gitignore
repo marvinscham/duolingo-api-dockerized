@@ -1,0 +1,3 @@
+duo_settings.py
+*.json
+__pycache__
