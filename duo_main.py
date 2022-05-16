@@ -1,7 +1,15 @@
-import json, sys, time
+import json, sys, time, logging
 import duolingo
 from datetime import datetime
 from duo_settings import duo_user_name, duo_user_password
+
+log = logging.getLogger("duolingo-data")
+log.setLevel("INFO")
+handler = logging.StreamHandler()
+handler.setFormatter(
+    logging.Formatter("%(asctime)s : %(levelname)s : %(name)s : %(message)s")
+)
+log.addHandler(handler)
 
 duo_user = duolingo.Duolingo(duo_user_name, duo_user_password)
 user_fields = [
@@ -37,15 +45,14 @@ str_user = json.dumps(user_object, indent=4)
 str_lang = json.dumps(lang_data, indent=4)
 
 if len(str_user) < 10 or len(str_lang) < 10:
-    print("error...")
-    sys.exit()
+    log.error("Response might be faulty...")
 else:
     f = open("duo_user_info.json", "w")
     f.write(str_user)
     f.close()
-    print("wrote user info")
 
     f = open("duo_lang_info.json", "w")
     f.write(str_lang)
     f.close()
-    print("wrote lang info")
+
+    log.info("Successfully updated info")

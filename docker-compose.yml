@@ -1,0 +1,11 @@
+version: '3.2'
+
+services:
+  duolingo-data:
+    build: .
+    container_name: duolingo-data
+    restart: unless-stopped
+    environment:
+      - TIMEZONE=Europe/Berlin
+    # ports:
+    #   - 80:7000
