@@ -1,8 +1,7 @@
-from asyncio import start_server
-import json, time, datetime, logging, _thread, schedule
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import json, time, logging, schedule, requests
+from datetime import datetime
 import duolingo
-from duo_settings import duo_user_name, duo_user_password
+from duo_settings import duo_user_name, duo_user_password, server_url
 
 log = logging.getLogger("duolingo-data")
 log.setLevel("INFO")
@@ -12,18 +11,13 @@ handler.setFormatter(
 )
 log.addHandler(handler)
 
+log.info("I'm alive!")
 
-def start_server(
-    server_class=HTTPServer,
-    handler_class=BaseHTTPRequestHandler,
-    addr="0.0.0.0",
-    port=7000,
-):
-    server_address = (addr, port)
-    httpd = server_class(server_address, handler_class)
 
-    log.info(f"Starting httpd server on {addr}:{port}")
-    httpd.serve_forever()
+def connectivity_handler():
+    page = requests.get(server_url + "/duo_user_info.json")
+    if page.status_code != 200:
+        log.error("Server cannot be reached.")
 
 
 def job():
@@ -72,12 +66,15 @@ def job():
 
         log.info("Successfully updated info")
 
+    time.sleep(2)
+    connectivity_handler()
 
-_thread.start_new_thread(start_server(), ())
 
-job()
 schedule.every(15).minutes.do(job)
+log.info("Schedule registered, starting first job execution...")
+job()
 
 while True:
     schedule.run_pending()
+
     time.sleep(1)
