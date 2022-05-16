@@ -1,5 +1,10 @@
 version: '3.2'
 
+# swag reverse proxy network
+networks:
+  schmoekerei:
+    external: true
+
 services:
   duolingo-data:
     build: .
@@ -9,3 +14,5 @@ services:
       - TIMEZONE=Europe/Berlin
     # ports:
     #   - 80:7000
+    networks:
+      - schmoekerei

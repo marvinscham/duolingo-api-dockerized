@@ -75,6 +75,7 @@ def job():
 
 _thread.start_new_thread(start_server(), ())
 
+job()
 schedule.every(15).minutes.do(job)
 
 while True:
