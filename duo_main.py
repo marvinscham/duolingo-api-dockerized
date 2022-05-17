@@ -78,6 +78,7 @@ def job():
         connectivity_handler()
     except Exception as e:
         log.error(e)
+        return
 
 
 schedule.every(30).minutes.do(job)
