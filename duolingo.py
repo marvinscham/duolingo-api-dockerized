@@ -147,6 +147,16 @@ class Duolingo(object):
             url += "?fields={}".format(fields_params)
         return url
 
+    def get_xp_summaries(self, start_date, end_date):
+        url = "https://www.duolingo.com/2017-06-30/users/{}/xp_summaries?startDate={}&endDate={}&timezone=Europe%2FLondon".format(
+            self.user_data.id, start_date, end_date
+        )
+        get = self._make_req(url)
+        if get.status_code == 404:
+            raise DuolingoException("Summary not found")
+        else:
+            return get.json()
+
     def get_user_url(self):
         return "https://duolingo.com/users/%s" % self.username
 

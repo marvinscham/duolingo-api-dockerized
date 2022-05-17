@@ -37,11 +37,9 @@ def job():
         learning_language_abbr = user_total_info["learningLanguage"]
 
         user_date_timestamp = user_total_info["creationDate"]
-        user_date_str = datetime.fromtimestamp(user_date_timestamp).strftime("%d/%m/%Y")
+        user_date_str = datetime.fromtimestamp(user_date_timestamp).strftime("%Y-%m-%d")
 
         language_progress = duo_user.get_language_progress(learning_language_abbr)
-
-        xp_progress = duo_user.get_daily_xp_progress()
 
         streak_info = duo_user.get_streak_info()
 
@@ -51,10 +49,12 @@ def job():
             "xp": user_total_info["totalXp"],
             "creation_date": user_date_str,
             "learning_language": language_progress["language_string"],
-            "xp_today": xp_progress["xp_today"],
-            "lessons_today": len(xp_progress["lessons_today"]),
             "streak_today": streak_info["streak_extended_today"],
             "timestamp": str(int(time.time())),
+            "last_week": duo_user.get_xp_summaries(
+                datetime.fromtimestamp(time.time() - 1209600).strftime("%Y-%m-%d"),
+                datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d"),
+            ),
         }
 
         lang_data = duo_user.get_all_languages()
