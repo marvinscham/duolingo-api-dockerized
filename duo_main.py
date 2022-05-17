@@ -20,7 +20,7 @@ def connectivity_handler():
         log.error("Server cannot be reached.")
 
 
-def job():
+def job(retries=5):
     try:
         duo_user = duolingo.Duolingo(duo_user_name, duo_user_password)
         user_fields = [
@@ -83,7 +83,18 @@ def job():
         time.sleep(2)
         connectivity_handler()
     except Exception as e:
-        log.error(e)
+        log.warn(e)
+
+        retries -= 1
+
+        if retries == 0:
+            log.error("Out of retries. Waiting for next execution.")
+            return
+
+        log.info("Attempt {}, retrying in 60 seconds".format(5 - retries))
+        time.sleep(60)
+        job(retries)
+
         return
 
 
