@@ -1,7 +1,7 @@
 import json, time, logging, schedule, requests
 from datetime import datetime
 import duolingo
-from duo_settings import duo_user_name, duo_user_password, server_url
+from duo_settings import duo_user_name, duo_user_password, server_url, count_days
 
 log = logging.getLogger("duolingo-data")
 log.setLevel("INFO")
@@ -33,11 +33,15 @@ def job():
         ]
         user_total_info = duo_user.get_data_by_user_id(user_fields)
 
+        date_format = "%Y-%m-%d"
+
         username = user_total_info["trackingProperties"]["username"]
         learning_language_abbr = user_total_info["learningLanguage"]
 
         user_date_timestamp = user_total_info["creationDate"]
-        user_date_str = datetime.fromtimestamp(user_date_timestamp).strftime("%Y-%m-%d")
+        user_date_str = datetime.fromtimestamp(user_date_timestamp).strftime(
+            date_format
+        )
 
         language_progress = duo_user.get_language_progress(learning_language_abbr)
 
@@ -52,8 +56,10 @@ def job():
             "streak_today": streak_info["streak_extended_today"],
             "timestamp": str(int(time.time())),
             "last_week": duo_user.get_xp_summaries(
-                datetime.fromtimestamp(time.time() - 1209600).strftime("%Y-%m-%d"),
-                datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d"),
+                datetime.fromtimestamp(
+                    time.time() - (60 * 60 * 24 * (count_days - 1))
+                ).strftime(date_format),
+                datetime.fromtimestamp(time.time()).strftime(date_format),
             ),
         }
 
