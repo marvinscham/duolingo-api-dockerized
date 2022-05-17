@@ -61,6 +61,8 @@ def job(retries=5):
             "learning_language": learning_language_abbr,
             "streak_today": streak_info["streak_extended_today"],
             "timestamp": str(int(time.time())),
+            "last_week_timezone": timezone,
+            "last_week_count": count_days,
             "last_week": duo_user.get_xp_summaries(
                 datetime.fromtimestamp(
                     time.time() - (60 * 60 * 24 * (count_days - 1))
