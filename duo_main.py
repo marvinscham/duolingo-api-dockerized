@@ -21,56 +21,66 @@ def connectivity_handler():
 
 
 def job():
-    duo_user = duolingo.Duolingo(duo_user_name, duo_user_password)
-    user_fields = [
-        "courses",
-        "creationDate",
-        "id",
-        "learningLanguage",
-        "totalXp",
-        "trackingProperties",
-    ]
-    user_total_info = duo_user.get_data_by_user_id(user_fields)
+    try:
+        duo_user = duolingo.Duolingo(duo_user_name, duo_user_password)
+        user_fields = [
+            "courses",
+            "creationDate",
+            "id",
+            "learningLanguage",
+            "totalXp",
+            "trackingProperties",
+        ]
+        user_total_info = duo_user.get_data_by_user_id(user_fields)
 
-    username = user_total_info["trackingProperties"]["username"]
-    learning_language_abbr = user_total_info["learningLanguage"]
+        username = user_total_info["trackingProperties"]["username"]
+        learning_language_abbr = user_total_info["learningLanguage"]
 
-    user_date_timestamp = user_total_info["creationDate"]
-    user_date_str = datetime.fromtimestamp(user_date_timestamp).strftime("%d/%m/%Y")
+        user_date_timestamp = user_total_info["creationDate"]
+        user_date_str = datetime.fromtimestamp(user_date_timestamp).strftime("%d/%m/%Y")
 
-    language_progress = duo_user.get_language_progress(learning_language_abbr)
+        language_progress = duo_user.get_language_progress(learning_language_abbr)
 
-    user_object = {
-        "username": username,
-        "streak": language_progress["streak"],
-        "xp": user_total_info["totalXp"],
-        "creation_date": user_date_str,
-        "learning_language": language_progress["language_string"],
-        "timestamp": str(int(time.time())),
-    }
+        xp_progress = duo_user.get_daily_xp_progress()
 
-    lang_data = duo_user.get_all_languages()
-    str_user = json.dumps(user_object, indent=4)
-    str_lang = json.dumps(lang_data, indent=4)
+        streak_info = duo_user.get_streak_info()
 
-    if len(str_user) < 10 or len(str_lang) < 10:
-        log.error("Faulty response from Duolingo")
-    else:
-        f = open("duo_user_info.json", "w")
-        f.write(str_user)
-        f.close()
+        user_object = {
+            "username": username,
+            "streak": language_progress["streak"],
+            "xp": user_total_info["totalXp"],
+            "creation_date": user_date_str,
+            "learning_language": language_progress["language_string"],
+            "xp_today": xp_progress["xp_today"],
+            "lessons_today": len(xp_progress["lessons_today"]),
+            "streak_today": streak_info["streak_extended_today"],
+            "timestamp": str(int(time.time())),
+        }
 
-        f = open("duo_lang_info.json", "w")
-        f.write(str_lang)
-        f.close()
+        lang_data = duo_user.get_all_languages()
+        str_user = json.dumps(user_object, indent=4)
+        str_lang = json.dumps(lang_data, indent=4)
 
-        log.info("Successfully updated info")
+        if len(str_user) < 10 or len(str_lang) < 10:
+            log.error("Faulty response from Duolingo")
+        else:
+            f = open("duo_user_info.json", "w")
+            f.write(str_user)
+            f.close()
 
-    time.sleep(2)
-    connectivity_handler()
+            f = open("duo_lang_info.json", "w")
+            f.write(str_lang)
+            f.close()
+
+            log.info("Successfully updated info")
+
+        time.sleep(2)
+        connectivity_handler()
+    except Exception as e:
+        log.error(e)
 
 
-schedule.every(15).minutes.do(job)
+schedule.every(30).minutes.do(job)
 log.info("Schedule registered, starting first job execution...")
 job()
 
