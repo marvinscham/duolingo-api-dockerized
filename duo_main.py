@@ -1,7 +1,13 @@
 import json, time, logging, schedule, requests
 from datetime import datetime
 import duolingo
-from duo_settings import duo_user_name, duo_user_password, server_url, count_days
+from duo_settings import (
+    duo_user_name,
+    duo_user_password,
+    server_url,
+    count_days,
+    timezone,
+)
 
 log = logging.getLogger("duolingo-data")
 log.setLevel("INFO")
@@ -60,6 +66,7 @@ def job(retries=5):
                     time.time() - (60 * 60 * 24 * (count_days - 1))
                 ).strftime(date_format),
                 datetime.fromtimestamp(time.time()).strftime(date_format),
+                timezone,
             ),
         }
 

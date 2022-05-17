@@ -147,9 +147,9 @@ class Duolingo(object):
             url += "?fields={}".format(fields_params)
         return url
 
-    def get_xp_summaries(self, start_date, end_date):
-        url = "https://www.duolingo.com/2017-06-30/users/{}/xp_summaries?startDate={}&endDate={}&timezone=Europe%2FLondon".format(
-            self.user_data.id, start_date, end_date
+    def get_xp_summaries(self, start_date, end_date, timezone):
+        url = "https://www.duolingo.com/2017-06-30/users/{}/xp_summaries?startDate={}&endDate={}&timezone={}".format(
+            self.user_data.id, start_date, end_date, timezone
         )
         get = self._make_req(url)
         if get.status_code == 404:
