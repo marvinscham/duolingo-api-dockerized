@@ -48,7 +48,7 @@ def job():
             "streak": language_progress["streak"],
             "xp": user_total_info["totalXp"],
             "creation_date": user_date_str,
-            "learning_language": language_progress["language_string"],
+            "learning_language": learning_language_abbr,
             "streak_today": streak_info["streak_extended_today"],
             "timestamp": str(int(time.time())),
             "last_week": duo_user.get_xp_summaries(
