@@ -7,7 +7,7 @@ duo_user_password = os.getenv("DUO_PASSWORD")
 server_url = os.getenv("SERVER_URL")
 
 timezone = os.getenv("TIMEZONE", "Europe/Berlin")
-xp_summary_days = os.getenv("XP_SUMMARY_DAYS", 30)
+xp_summary_days = int(os.getenv("XP_SUMMARY_DAYS", 30))
 
 log = logging.getLogger("duolingo-data")
 log.setLevel("INFO")
