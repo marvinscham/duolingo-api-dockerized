@@ -1,13 +1,13 @@
-import json, time, logging, schedule, requests
+import os, json, time, logging, schedule, requests
 from datetime import datetime
 import duolingo
-from duo_settings import (
-    duo_user_name,
-    duo_user_password,
-    server_url,
-    count_days,
-    timezone,
-)
+
+duo_user_name = os.getenv("DUO_USERNAME")
+duo_user_password = os.getenv("DUO_PASSWORD")
+server_url = os.getenv("SERVER_URL")
+
+timezone = os.getenv("TIMEZONE", "Europe/Berlin")
+xp_summary_days = os.getenv("XP_SUMMARY_DAYS", 30)
 
 log = logging.getLogger("duolingo-data")
 log.setLevel("INFO")
@@ -16,6 +16,9 @@ handler.setFormatter(
     logging.Formatter("%(asctime)s : %(levelname)s : %(name)s : %(message)s")
 )
 log.addHandler(handler)
+
+if not duo_user_name or not duo_user_password or not server_url:
+    raise KeyError("Incorrect setup: username, password or server url missing.")
 
 log.info("I'm alive!")
 
@@ -53,6 +56,11 @@ def job(retries=5):
 
         streak_info = duo_user.get_streak_info()
 
+        xp_summary_start = datetime.fromtimestamp(
+            time.time() - (60 * 60 * 24 * (xp_summary_days - 1))
+        ).strftime(date_format)
+        xp_summary_end = datetime.fromtimestamp(time.time()).strftime(date_format)
+
         user_object = {
             "username": username,
             "streak": language_progress["streak"],
@@ -61,13 +69,11 @@ def job(retries=5):
             "learning_language": learning_language_abbr,
             "streak_today": streak_info["streak_extended_today"],
             "timestamp": str(int(time.time())),
-            "last_week_timezone": timezone,
-            "last_week_count": count_days,
-            "last_week": duo_user.get_xp_summaries(
-                datetime.fromtimestamp(
-                    time.time() - (60 * 60 * 24 * (count_days - 1))
-                ).strftime(date_format),
-                datetime.fromtimestamp(time.time()).strftime(date_format),
+            "xp_summary_timezone": timezone,
+            "xp_summary_count": xp_summary_days,
+            "xp_summary": duo_user.get_xp_summaries(
+                xp_summary_start,
+                xp_summary_end,
                 timezone,
             ),
         }

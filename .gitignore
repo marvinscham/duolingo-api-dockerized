@@ -1,3 +1,4 @@
-duo_settings.py
+docker-compose.yml
+*.env
 *.json
 __pycache__

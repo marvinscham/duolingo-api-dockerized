@@ -149,11 +149,11 @@ class Duolingo(object):
 
     def get_xp_summaries(self, start_date, end_date, timezone):
         url = "https://www.duolingo.com/2017-06-30/users/{}/xp_summaries?startDate={}&endDate={}&timezone={}".format(
-            self.user_data.id, start_date, end_date, timezone
+            self.user_data.id, start_date, end_date, timezone.replace("/", "%2F")
         )
         get = self._make_req(url)
         if get.status_code == 404:
-            raise DuolingoException("Summary not found")
+            raise DuolingoException("XPSummary could not be found")
         else:
             return get.json()
 

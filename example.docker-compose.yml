@@ -1,0 +1,22 @@
+version: '3.2'
+
+# swag reverse proxy network
+networks:
+  yourNetwork:
+    external: true
+
+services:
+  duolingo-data:
+    build: .
+    container_name: duolingo-data
+    restart: unless-stopped
+    environment:
+      - TIMEZONE=Europe/Berlin
+      - DUO_USERNAME=yourUsername
+      - DUO_PASSWORD=yourPassword
+      - SERVER_URL=https://your-domain.com
+      - XP_SUMMARY_DAYS=30
+    # ports:
+    #   - 80:7000
+    networks:
+      - yourNetwork
