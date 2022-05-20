@@ -1,6 +1,6 @@
 version: '3.2'
 
-# swag reverse proxy network
+# e.g. swag reverse proxy network
 networks:
   yourNetwork:
     external: true
@@ -16,6 +16,8 @@ services:
       - DUO_PASSWORD=yourPassword
       - SERVER_URL=https://your-domain.com
       - XP_SUMMARY_DAYS=30
+      - UPDATE_INTERVAL=15
+      - MAX_RETRIES=3
     # ports:
     #   - 80:7000
     networks:

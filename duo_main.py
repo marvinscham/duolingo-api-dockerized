@@ -1,4 +1,4 @@
-import os, json, time, logging, schedule, requests
+import os, json, time, logging, schedule, requests, math
 from datetime import datetime
 import duolingo
 
@@ -8,6 +8,8 @@ server_url = os.getenv("SERVER_URL")
 
 timezone = os.getenv("TIMEZONE", "Europe/Berlin")
 xp_summary_days = int(os.getenv("XP_SUMMARY_DAYS", 30))
+update_interval = int(os.getenv("UPDATE_INTERVAL", 15))
+max_retries = int(os.getenv("MAX_RETRIES", 3))
 
 log = logging.getLogger("duolingo-data")
 log.setLevel("INFO")
@@ -29,7 +31,7 @@ def connectivity_handler():
         log.error("Server cannot be reached.")
 
 
-def job(retries=5):
+def job(retries=max_retries):
     try:
         duo_user = duolingo.Duolingo(duo_user_name, duo_user_password)
         user_fields = [
@@ -102,18 +104,18 @@ def job(retries=5):
 
         retries -= 1
 
-        if retries == 0:
+        if retries <= 0:
             log.error("Out of retries. Waiting for next execution.")
             return
 
-        log.info("Attempt {}, retrying in 60 seconds".format(5 - retries))
+        log.info("Attempt {}, retrying in 60 seconds".format(max_retries - retries))
         time.sleep(60)
         job(retries)
 
         return
 
 
-schedule.every(30).minutes.do(job)
+schedule.every(update_interval).minutes.do(job)
 log.info("Schedule registered, starting first job execution...")
 job()
 
