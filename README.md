@@ -33,22 +33,22 @@ See example.docker-compose.yml. You'll need to provide your own docker-compose.y
 
 ## Environment Variables
 
-- TIMEZONE
+- `TIMEZONE`
   - Relevant for determining which lessons belong to which day
   - Example/default: `Europe/Berlin`
-- DUO_USERNAME
+- `DUO_USERNAME`
   - Required for login
-- DUO_PASSWORD
+- `DUO_PASSWORD`
   - Required for login
-- SERVER_URL
+- `SERVER_URL`
   - Used for connectivity self check
   - Example: `https://your-domain.com` → no trailing slash!
-- XP_SUMMARY_DAYS
+- `XP_SUMMARY_DAYS`
   - Count of past days to get data from. Might stop working properly >300
   - Default: `30`
-- UPDATE_INTERVAL
+- `UPDATE_INTERVAL`
   - Time in minutes to request fresh data from Duolingo
   - Default: `15`
-- MAX_RETRIES
+- `MAX_RETRIES`
   - How often the app should retry in case of some connection error (retry interval 60 seconds)
   - Default: `3`
