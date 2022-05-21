@@ -1,6 +1,6 @@
 # duolingo-data
 
-duolingo-data is a python-based docker container which allows you to get data from your Duolingo account, effectively caching them for a certain time in JSON format.
+duolingo-data is a python-based docker image which allows you to get data from your Duolingo account, effectively caching them for a certain time and serving them in JSON format.
 
 ## Example Setup
 
