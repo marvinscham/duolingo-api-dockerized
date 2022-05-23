@@ -10,26 +10,26 @@ See example.docker-compose.yml. You'll need to provide your own docker-compose.y
 
     # e.g. swag reverse proxy network
     networks:
-    yourNetwork:
-    external: true
+      yourNetwork:
+        external: true
 
     services:
-    duolingo-data:
-    build: .
-    container_name: duolingo-data
-    restart: unless-stopped
-    environment:
-    - TIMEZONE=Europe/Berlin
-    - DUO_USERNAME=yourUsername
-    - DUO_PASSWORD=yourPassword
-    - SERVER_URL=https://your-domain.com
-    - XP_SUMMARY_DAYS=30
-    - UPDATE_INTERVAL=15
-    - MAX_RETRIES=3
-    # ports:
-    # - 80:7000
-    networks:
-    - yourNetwork
+      duolingo-data:
+        build: .
+        container_name: duolingo-data
+        restart: unless-stopped
+        environment:
+          - TIMEZONE=Europe/Berlin
+          - DUO_USERNAME=yourUsername
+          - DUO_PASSWORD=yourPassword
+          - SERVER_URL=https://your-domain.com
+          - XP_SUMMARY_DAYS=30
+          - UPDATE_INTERVAL=15
+          - MAX_RETRIES=3
+        # ports:
+        #   - 80:7000
+        networks:
+          - yourNetwork
 
 ## Environment Variables
 
@@ -44,7 +44,7 @@ See example.docker-compose.yml. You'll need to provide your own docker-compose.y
   - Used for connectivity self check
   - Example: `https://your-domain.com` → no trailing slash!
 - `XP_SUMMARY_DAYS`
-  - Count of past days to get data from. Might stop working properly >300
+  - Number of past days to get data from. Might stop working properly if > 300
   - Default: `30`
 - `UPDATE_INTERVAL`
   - Time in minutes to request fresh data from Duolingo

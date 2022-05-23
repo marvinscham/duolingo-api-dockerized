@@ -100,7 +100,7 @@ def job(retries=max_retries):
         time.sleep(2)
         connectivity_handler()
     except Exception as e:
-        log.warn(e)
+        log.warning(e)
 
         retries -= 1
 
