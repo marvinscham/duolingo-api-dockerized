@@ -63,6 +63,8 @@ def job(retries=max_retries):
         ).strftime(date_format)
         xp_summary_end = datetime.fromtimestamp(time.time()).strftime(date_format)
 
+        lang_data = duo_user.get_all_languages()
+
         user_object = {
             "username": username,
             "streak": language_progress["streak"],
@@ -78,21 +80,16 @@ def job(retries=max_retries):
                 xp_summary_end,
                 timezone,
             ),
+            "lang_data": lang_data,
         }
 
-        lang_data = duo_user.get_all_languages()
         str_user = json.dumps(user_object, indent=4)
-        str_lang = json.dumps(lang_data, indent=4)
 
-        if len(str_user) < 10 or len(str_lang) < 10:
+        if len(str_user) < 10:
             log.error("Faulty response from Duolingo")
         else:
             f = open("duo_user_info.json", "w")
             f.write(str_user)
-            f.close()
-
-            f = open("duo_lang_info.json", "w")
-            f.write(str_lang)
             f.close()
 
             log.info("Successfully updated info")
