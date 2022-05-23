@@ -35,7 +35,7 @@ See example.docker-compose.yml. You'll need to provide your own docker-compose.y
 
 - `TIMEZONE`
   - Relevant for determining which lessons belong to which day
-  - Example/default: `Europe/Berlin`
+  - Default: `Europe/Berlin`
 - `DUO_USERNAME`
   - Required for login
 - `DUO_PASSWORD`
