@@ -12,7 +12,9 @@ Based on [KartikTalkwar/Duolingo](https://github.com/KartikTalwar/Duolingo), uti
     
 ## Example Setup
 
-See example.docker-compose.yml. You'll need to provide your own docker-compose.yml, which you can base on this example file.
+See `example.docker-compose.yml`. You'll need to provide your own `docker-compose.yml`, which you can base on this example file.
+
+In case you'd like to run this behind a nginx reverse proxy, you can use `nginx.conf` as a reference.
 
     version: '3.2'
 
