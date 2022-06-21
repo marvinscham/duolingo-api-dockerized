@@ -4,7 +4,9 @@
     
 <h1>Duolingo Data</h1>
 
-Duolingo Data is a Python-based Docker image which allows you to set up a basic JSON API to get cached data from.
+Duolingo Data is a Python-based Docker image which allows you to set up a basic JSON API to get cached data about your Duolingo Account.
+    
+Based on [KartikTalkwar/Duolingo](https://github.com/KartikTalwar/Duolingo), utilizing modifications from [lidiaCirrone/pw-duolingo-data](https://github.com/lidiaCirrone/pw-duolingo-data).
 
 </div>
     
