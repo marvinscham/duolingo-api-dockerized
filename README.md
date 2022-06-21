@@ -1,7 +1,13 @@
-# duolingo-data
+<div align="center">
+    
+![Duolingo Logo](https://github.com/marvinscham/schmoekerei-icons/blob/main/icons/duolingo.png)
+    
+<h1>Duolingo Data</h1>
 
-duolingo-data is a python-based docker image which allows you to get data from your Duolingo account, effectively caching them for a certain time and serving them in JSON format.
+Duolingo Data is a Python-based Docker image which allows you to set up a basic JSON API to get cached data from.
 
+</div>
+    
 ## Example Setup
 
 See example.docker-compose.yml. You'll need to provide your own docker-compose.yml, which you can base on this example file.
