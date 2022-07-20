@@ -2,9 +2,9 @@
     
 ![Duolingo Logo](https://github.com/marvinscham/schmoekerei-icons/blob/main/icons/duolingo.png)
     
-<h1>Duolingo Docker API</h1>
+<h1>Duolingo API Dockerized</h1>
 
-Duolingo Docker API is a Python-based Docker image which allows you to set up a basic JSON API to get cached data about your Duolingo Account.
+Duolingo API Dockerized is a Python-based Docker image which allows you to set up a basic JSON API to get cached data about your Duolingo Account.
     
 Based on [KartikTalwar/Duolingo](https://github.com/KartikTalwar/Duolingo), utilizing modifications from [lidiaCirrone/pw-duolingo-data](https://github.com/lidiaCirrone/pw-duolingo-data).
 
