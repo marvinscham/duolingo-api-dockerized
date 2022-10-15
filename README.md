@@ -1,6 +1,6 @@
 <div align="center">
     
-![Duolingo Logo](https://raw.githubusercontent.com/marvinscham/duolingo-api-dockerized/main/duolingo.png)
+![Duolingo Logo](duolingo.png)
     
 <h1>Duolingo API Dockerized</h1>
 
