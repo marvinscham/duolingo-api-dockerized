@@ -3,7 +3,7 @@ from datetime import datetime
 import duolingo
 
 duo_user_name = os.getenv("DUO_USERNAME")
-duo_user_password = os.getenv("DUO_PASSWORD")
+duo_user_jwt = os.getenv("DUO_JWT")
 server_url = os.getenv("SERVER_URL")
 
 timezone = os.getenv("TIMEZONE", "Europe/Berlin")
@@ -19,7 +19,7 @@ handler.setFormatter(
 )
 log.addHandler(handler)
 
-if not duo_user_name or not duo_user_password or not server_url:
+if not duo_user_name or not duo_user_jwt or not server_url:
     raise KeyError("Incorrect setup: username, password or server url missing.")
 
 log.info("I'm alive!")
@@ -33,7 +33,10 @@ def connectivity_handler():
 
 def job(retries=max_retries):
     try:
-        duo_user = duolingo.Duolingo(duo_user_name, duo_user_password)
+        duo_user = duolingo.Duolingo(
+            username=duo_user_name,
+            jwt=duo_user_jwt,
+        )
         user_fields = [
             "courses",
             "creationDate",
