@@ -20,7 +20,7 @@ handler.setFormatter(
 log.addHandler(handler)
 
 if not duo_user_name or not duo_user_jwt or not server_url:
-    raise KeyError("Incorrect setup: username, password or server url missing.")
+    raise KeyError("Incorrect setup: username, jwt or server url missing.")
 
 log.info("I'm alive!")
 
