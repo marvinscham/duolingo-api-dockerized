@@ -1,4 +1,4 @@
-name: Build and Publish to GHCR
+name: Analyze, Release and Publish to GHCR
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
       - 'v*.*.*-*'
 
 jobs:
-  build:
-    name: Build
+  analyze:
+    name: Analyze
     runs-on: ubuntu-latest
     permissions: read-all
 
@@ -17,17 +17,7 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
-      - name: Extract tag name
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-      - uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: -Dsonar.projectVersion=${{ env.VERSION }}
-
-      - name: Extract tag name and check if pre-release
+      - name: Extract tag and pre-release check
         run: |
           echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
           if [[ "${GITHUB_REF#refs/tags/}" == *-* ]]; then
@@ -35,6 +25,54 @@ jobs:
           else
             echo "PRERELEASE=false" >> $GITHUB_ENV
           fi
+
+      - name: SonarQube scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: -Dsonar.projectVersion=${{ env.VERSION }}
+
+      - name: Quality gate check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  release:
+    name: Release
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Generate release notes
+        id: changelog
+        run: |
+          CHANGELOG=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"- %s")
+          echo "CHANGELOG=$CHANGELOG" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: ${{env.PRERELEASE == 'true'}}
+          body: ${{ env.CHANGELOG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v1
