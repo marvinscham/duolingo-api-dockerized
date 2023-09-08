@@ -8,6 +8,9 @@ Serves your Duolingo progress info as JSON.
 
 Based on [KartikTalwar/Duolingo](https://github.com/KartikTalwar/Duolingo), utilizing modifications from [lidiaCirrone/pw-duolingo-data](https://github.com/lidiaCirrone/pw-duolingo-data).
 
+![GitHub release (with filter)](https://img.shields.io/github/v/release/marvinscham/duolingo-api-dockerized)
+[![Quality Gate Status](https://sonar.ms-ds.org/api/project_badges/measure?project=Duolingo-API-Dockerized&metric=alert_status&token=sqb_d0fa0ab8bdae8eda3db5414f9483e03e91034da3)](https://sonar.ms-ds.org/dashboard?id=Duolingo-API-Dockerized)
+
 </div>
 
 ## Example Setup
