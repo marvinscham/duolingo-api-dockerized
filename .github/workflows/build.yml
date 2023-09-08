@@ -64,7 +64,7 @@ jobs:
           prerelease: ${{env.PRERELEASE == 'true'}}
           body: ${{ env.CHANGELOG }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
 
   publish:
     name: Publish
