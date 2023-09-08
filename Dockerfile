@@ -13,7 +13,7 @@ COPY duo_server.py .
 COPY exec.sh .
 COPY duo_main.py .
 
-RUN chown -R appuser:appuser /app
+RUN chown -R duolingoapi:duolingoapi /app
 
 USER duolingoapi
 
