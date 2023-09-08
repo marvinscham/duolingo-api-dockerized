@@ -106,8 +106,7 @@ class Duolingo(object):
         if self.jwt is None:
             self._load_session_from_file()
         if self._check_login():
-            return True
-        # self.jwt = None
+            return
 
         login_url = "https://www.duolingo.com/login"
         data = {"login": self.username, "password": self.password}
@@ -117,7 +116,7 @@ class Duolingo(object):
         if "failure" not in attempt:
             self.jwt = request.headers["jwt"]
             self._save_session_to_file()
-            return True
+            return
 
         raise DuolingoException("Login failed")
 
@@ -142,7 +141,8 @@ class Duolingo(object):
     def get_user_url_by_id(self, fields=None):
         if fields is None:
             fields = []
-        url = "https://www.duolingo.com/2017-06-30/users/{}".format(self.user_data.id)
+        url = "https://www.duolingo.com/2017-06-30/users/{}".format(
+            self.user_data.id)
         fields_params = requests.utils.requote_uri(",".join(fields))
         if fields_params:
             url += "?fields={}".format(fields_params)
@@ -150,7 +150,8 @@ class Duolingo(object):
 
     def get_xp_summaries(self, start_date, end_date, timezone):
         url = "https://www.duolingo.com/2017-06-30/users/{}/xp_summaries?startDate={}&endDate={}&timezone={}".format(
-            self.user_data.id, start_date, end_date, timezone.replace("/", "%2F")
+            self.user_data.id, start_date, end_date, timezone.replace(
+                "/", "%2F")
         )
         get = self._make_req(url)
         if get.status_code == 404:
@@ -180,7 +181,8 @@ class Duolingo(object):
             raise ValueError("Needs unit as argument (week or month)")
 
         if not before:
-            raise ValueError('Needs str in Datetime format "%Y.%m.%d %H:%M:%S"')
+            raise ValueError(
+                'Needs str in Datetime format "%Y.%m.%d %H:%M:%S"')
 
         if isinstance(before, datetime):
             before = before.strftime("%Y.%m.%d %H:%M:%S")
@@ -303,7 +305,7 @@ class Duolingo(object):
         """
         get = self._make_req(self.get_user_url())
         if get.status_code == 404:
-            raise Exception("User not found")
+            raise DuolingoException("User not found")
         else:
             return get.json()
 
@@ -312,7 +314,7 @@ class Duolingo(object):
         data = {}
 
         for key in keys:
-            if type(array) == dict:
+            if isinstance(array, dict):
                 data[key] = array[key]
             else:
                 data[key] = getattr(array, key, None)
@@ -360,7 +362,8 @@ class Duolingo(object):
 
     def get_settings(self):
         """Get user settings."""
-        keys = ["notify_comment", "deactivated", "is_follower_by", "is_following"]
+        keys = ["notify_comment", "deactivated",
+                "is_follower_by", "is_following"]
 
         return self._make_dict(keys, self.user_data)
 
@@ -398,15 +401,15 @@ class Duolingo(object):
         data = {}
 
         for course in results["courses"]:
-            learningLanguage = course["learningLanguage"]
-            fromLanguage = course["fromLanguage"]
-            language_id = f"{learningLanguage}_{fromLanguage}"
+            learning_language = course["learningLanguage"]
+            from_language = course["fromLanguage"]
+            language_id = f"{learning_language}_{from_language}"
             xp = course["xp"]
             crowns = course["crowns"]
             data[language_id] = {
-                "learningLanguage": learningLanguage,
-                "learningLanguageFull": self.get_language_from_abbr(learningLanguage),
-                "fromLanguage": fromLanguage,
+                "learningLanguage": learning_language,
+                "learningLanguageFull": self.get_language_from_abbr(learning_language),
+                "fromLanguage": from_language,
                 "xp": xp,
                 "crowns": crowns,
             }
@@ -592,7 +595,8 @@ class Duolingo(object):
         list_segments = self._segment_translations_list(words)
         results = dict()
         for segment in list_segments:
-            results = {**results, **self._get_raw_translations(segment, source, target)}
+            results = {**results, **
+                       self._get_raw_translations(segment, source, target)}
         return results
 
     def _segment_translations_list(self, words):
@@ -674,9 +678,10 @@ class Duolingo(object):
     _tts_voices = None
 
     def _process_tts_voices(self):
-        voices_js = re.search(r"duo\.tts_multi_voices = {.+};", self._homepage).group(0)
+        voices_js = re.search(
+            r"duo\.tts_multi_voices = {.+};", self._homepage).group(0)
 
-        voices = voices_js[voices_js.find("{") : voices_js.find("}") + 1]
+        voices = voices_js[voices_js.find("{"): voices_js.find("}") + 1]
         self._tts_voices = json.loads(voices)
 
     def get_language_voices(self, language_abbr=None):
@@ -695,13 +700,15 @@ class Duolingo(object):
     def get_audio_url(self, word, language_abbr=None, rand=True, voice=None):
         # Check word is in vocab
         if word is None:
-            raise DuolingoException("A word must be specified to use this function")
+            raise DuolingoException(
+                "A word must be specified to use this function")
         word = word.lower()
         # Get default language abbr
         if not language_abbr:
             language_abbr = list(self.user_data.language_data.keys())[0]
         if language_abbr not in self.user_data.language_data:
-            raise DuolingoException("This language is not one you are studying")
+            raise DuolingoException(
+                "This language is not one you are studying")
         # Populate voice url dict
         if self.voice_url_dict is None or language_abbr not in self.voice_url_dict:
             self._populate_voice_url_dictionary(language_abbr)
@@ -746,29 +753,34 @@ class Duolingo(object):
             if resp.status_code != 200:
                 continue
             resp_data = resp.json()
-            for challenge in resp_data["challenges"]:
-                if "prompt" in challenge and "tts" in challenge:
-                    self._add_to_voice_url_dict(
-                        lang_abbr, challenge["prompt"], challenge["tts"]
-                    )
-                if challenge.get("metadata") and challenge["metadata"].get(
-                    "non_character_tts"
-                ):
-                    for word, url in challenge["metadata"]["non_character_tts"][
-                        "tokens"
-                    ].items():
-                        self._add_to_voice_url_dict(lang_abbr, word, url)
-                if "tokens" in challenge:
-                    self._add_token_list_to_voice_url_dict(
-                        lang_abbr, challenge["tokens"]
-                    )
+            self._add_challenges_to_voice_url_dict(
+                lang_abbr, resp_data["challenges"])
+
+    def _add_challenges_to_voice_url_dict(self, lang_abbr, challenges):
+        for challenge in challenges:
+            if "prompt" in challenge and "tts" in challenge:
+                self._add_to_voice_url_dict(
+                    lang_abbr, challenge["prompt"], challenge["tts"]
+                )
+            if challenge.get("metadata") and challenge["metadata"].get(
+                "non_character_tts"
+            ):
+                for word, url in challenge["metadata"]["non_character_tts"][
+                    "tokens"
+                ].items():
+                    self._add_to_voice_url_dict(lang_abbr, word, url)
+            if "tokens" in challenge:
+                self._add_token_list_to_voice_url_dict(
+                    lang_abbr, challenge["tokens"]
+                )
 
     def _add_token_list_to_voice_url_dict(self, lang_abbr, token_list):
         for token in token_list:
             if isinstance(token, list):
                 self._add_token_list_to_voice_url_dict(lang_abbr, token)
             if isinstance(token, dict) and token.get("tts") and token.get("value"):
-                self._add_to_voice_url_dict(lang_abbr, token["value"], token["tts"])
+                self._add_to_voice_url_dict(
+                    lang_abbr, token["value"], token["tts"])
 
     def _add_to_voice_url_dict(self, lang_abbr, word, url):
         word = word.lower()
@@ -804,10 +816,11 @@ class Duolingo(object):
         try:
             return request.json()
         except:
-            raise Exception("Could not get word definition")
+            raise DuolingoException("Could not get word definition")
 
     def get_daily_xp_progress(self):
-        daily_progress = self.get_data_by_user_id(["xpGoal", "xpGains", "streakData"])
+        daily_progress = self.get_data_by_user_id(
+            ["xpGoal", "xpGains", "streakData"])
 
         if not daily_progress:
             raise DuolingoException(
@@ -825,7 +838,8 @@ class Duolingo(object):
         # Sometimes the update is marked into the future. When this is the case
         # we fall back on the system time for midnight.
         time_discrepancy = min(midnight - reported_midnight, timedelta(0))
-        update_cutoff = round((reported_midnight + time_discrepancy).timestamp())
+        update_cutoff = round(
+            (reported_midnight + time_discrepancy).timestamp())
 
         lessons = [
             lesson
