@@ -13,6 +13,8 @@ COPY duo_server.py .
 COPY exec.sh .
 COPY duo_main.py .
 
+RUN chown -R appuser:appuser /app
+
 USER duolingoapi
 
 HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD curl -sS 127.0.0.1:7000/health || exit 1
