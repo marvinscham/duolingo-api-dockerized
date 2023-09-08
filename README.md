@@ -43,6 +43,8 @@ services:
       - yourNetwork
 ```
 
+This will serve your progress info at `https://duo.your-domain.com/duo_user_info.json`.
+
 ## Environment Variables
 
 - `TIMEZONE`
