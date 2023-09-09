@@ -57,16 +57,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Generate release notes
+      - name: Build Changelog
         id: changelog
-        run: echo changelog=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"- %s") >> "$GITHUB_OUTPUT"
+        uses: mikepenz/release-changelog-builder-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          name: Release ${{ needs.env.outputs.version }}
           draft: false
           prerelease: ${{ needs.env.outputs.prerelease == 'true' }}
           body: ${{ steps.changelog.outputs.changelog }}
