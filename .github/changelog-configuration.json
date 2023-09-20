@@ -1,0 +1,44 @@
+{
+  "categories": [
+    {
+      "labels": ["breaking"],
+      "title": "## 💥 Breaking Changes"
+    },
+    {
+      "labels": ["feature"],
+      "title": "## 🚀 Features"
+    },
+    {
+      "labels": ["bug", "fix"],
+      "title": "## 🐛 Bug Fixes"
+    },
+    {
+      "labels": ["documentation"],
+      "title": "## 📝 Documentation"
+    },
+    {
+      "labels": ["chore"],
+      "title": "## 🧹 Chores"
+    },
+    {
+      "labels": ["dependencies"],
+      "title": "## 🔃 Dependencies"
+    },
+    {
+      "labels": ["test"],
+      "title": "## 🧪 Tests"
+    },
+    {
+      "title": "## 💬 Other",
+      "labels": ["other"]
+    }
+  ],
+  "ignore_labels": ["ignore"],
+  "sort": {
+    "order": "ASC",
+    "on_property": "mergedAt"
+  },
+  "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
+  "change-template": "- [##{{NUMBER}}] #{{TITLE}}",
+  "empty_template": "- no changes"
+}
