@@ -1,7 +1,7 @@
 name: Analyze
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - main
 
@@ -9,12 +9,14 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    environment: manual-approval
     permissions: read-all
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
 
       - name: SonarQube scan
         uses: sonarsource/sonarqube-scan-action@master
