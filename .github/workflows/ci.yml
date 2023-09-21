@@ -11,7 +11,7 @@ on:
 
 jobs:
   sonarqube:
-    name: Analyze PR
+    name: SonarQube Scan
     runs-on: ubuntu-latest
     permissions: read-all
 
@@ -26,7 +26,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: Quality gate check
+      - name: Quality Gate check
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
         env:
