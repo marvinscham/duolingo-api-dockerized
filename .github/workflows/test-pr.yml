@@ -1,4 +1,4 @@
-name: Analyze
+name: Analyze PR
 
 on:
   pull_request_target:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze PR
     runs-on: ubuntu-latest
     environment: manual-approval
     permissions: read-all
@@ -25,7 +25,9 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
-            -Dsonar.projectVersion=PR-${{ github.event.pull_request.number }}
+            -Dsonar.pullrequest.key=${{ github.event.number }}
+            -Dsonar.pullrequest.branch=${{ github.HEAD_REF }}
+            -Dsonar.pullrequest.base=${{ github.BASE_REF }}
 
       - name: Quality gate check
         uses: sonarsource/sonarqube-quality-gate-action@master
@@ -37,7 +39,7 @@ jobs:
     name: 'Dependabot'
     needs: analyze
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request'}}
+    if: ${{ github.actor == 'dependabot[bot]'}}
     steps:
       - name: Dependabot metadata
         id: metadata
