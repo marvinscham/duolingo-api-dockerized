@@ -8,7 +8,7 @@ Serves your Duolingo progress info as JSON.
 
 Based on [KartikTalwar/Duolingo](https://github.com/KartikTalwar/Duolingo), utilizing modifications from [lidiaCirrone/pw-duolingo-data](https://github.com/lidiaCirrone/pw-duolingo-data).
 
-![GitHub release (with filter)](https://img.shields.io/github/v/release/marvinscham/duolingo-api-dockerized)
+![GitHub release](https://img.shields.io/github/v/release/marvinscham/duolingo-api-dockerized)
 [![Quality Gate Status](https://sonar.ms-ds.org/api/project_badges/measure?project=Duolingo-API-Dockerized&metric=alert_status&token=sqb_d0fa0ab8bdae8eda3db5414f9483e03e91034da3)](https://sonar.ms-ds.org/dashboard?id=Duolingo-API-Dockerized)
 
 </div>
@@ -22,7 +22,7 @@ In case you'd like to run this behind a nginx reverse proxy, you can use `nginx.
 ```yml
 version: '3.2'
 
-# e.g. swag reverse proxy network
+# e.g. reverse proxy network
 networks:
   yourNetwork:
     external: true
@@ -36,7 +36,6 @@ services:
       - TIMEZONE=Europe/Berlin
       - DUO_USERNAME=yourUsername
       - DUO_JWT=yourJWT
-      - SERVER_URL=https://duo.your-domain.com
       - XP_SUMMARY_DAYS=30
       - UPDATE_INTERVAL=15
       - MAX_RETRIES=3
@@ -57,9 +56,6 @@ This will serve your progress info at `https://duo.your-domain.com/duo_user_info
   - Required for login
 - `DUO_JWT`
   - Login token (**Not your password!** Info on obtaining this is in the following segment)
-- `SERVER_URL`
-  - Used for connectivity self check
-  - Example: `https://your-domain.com` → without trailing slash!
 - `XP_SUMMARY_DAYS`
   - Number of past days to get data from. _Might stop working properly if > 300_
   - Default: `30`
@@ -72,7 +68,7 @@ This will serve your progress info at `https://duo.your-domain.com/duo_user_info
 
 ## Grabbing your JWT
 
-Login on [Duolingo](duolingo.com) and run the following JavaScript in your browser console. The returned string is your JWT.
+Login on [Duolingo](duolingo.com) and run the following JavaScript in your browser console. The returned string is your JWT. Do not share this token as it will allow anyone to access your Duolingo account.
 
 ```js
 document.cookie.match(new RegExp('(^| )jwt_token=([^;]+)'))[0].slice(11);
