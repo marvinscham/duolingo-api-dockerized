@@ -1,34 +1,30 @@
-name: Analyze Branch
-
+name: CI
+# Trigger analysis when pushing to your main branches, and when creating a pull request.
 on:
   push:
-    branches-ignore:
-      - 'main'
+    branches:
+      - main
+      - develop
+      - 'release/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  analyze:
-    name: Analyze Branch
+  sonarqube:
+    name: Analyze PR
     runs-on: ubuntu-latest
     permissions: read-all
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-
-      - name: Extract branch name
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
+          fetch-depth: 0
 
       - name: SonarQube scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: >
-            -Dsonar.branch.name=${{ steps.extract_branch.outputs.branch }}
 
       - name: Quality gate check
         uses: sonarsource/sonarqube-quality-gate-action@master

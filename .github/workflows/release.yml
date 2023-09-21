@@ -1,4 +1,4 @@
-name: Analyze, Release and Publish to GHCR
+name: Release
 
 on:
   push:
@@ -7,16 +7,23 @@ on:
       - 'v*.*.*-*'
 
 jobs:
-  env:
-    name: Prepare environment
+  context:
+    name: Determine context
     runs-on: ubuntu-latest
     outputs:
       version: ${{steps.version.outputs.version}}
       prerelease: ${{steps.prerelease.outputs.prerelease}}
     steps:
-      - id: version
+      - name: Grab version
+        id: version
         run: echo "version=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-      - id: prerelease
+
+      - name: Grab major version
+        id: major
+        run: echo "major=$(echo ${GITHUB_REF#refs/tags/} | cut -d'.' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Determine (pre-)release status
+        id: prerelease
         run: |
           if [[ "${GITHUB_REF#refs/tags/}" == *-* ]]; then
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
@@ -24,36 +31,9 @@ jobs:
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
           fi
 
-  analyze:
-    name: Pre-build Analysis
-    needs: env
-    runs-on: ubuntu-latest
-    permissions: read-all
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-
-      - name: SonarQube scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: |
-            -Dsonar.branch.name=main
-            -Dsonar.projectVersion=${{ needs.env.outputs.version }}
-
-      - name: Quality gate check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   release:
     name: Release
-    needs: [env, analyze]
+    needs: context
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -72,21 +52,18 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
-          name: Release ${{ needs.env.outputs.version }}
+          name: Release ${{ needs.context.outputs.version }}
           draft: false
-          prerelease: ${{ needs.env.outputs.prerelease == 'true' }}
+          prerelease: ${{ needs.context.outputs.prerelease == 'true' }}
           body: ${{ steps.changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ secrets.GHCR_PAT }}
 
   publish:
-    name: Publish to GHCR
-    needs: [env, release]
+    name: Build and push
+    needs: [context, release]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -95,14 +72,18 @@ jobs:
           password: ${{ secrets.GHCR_PAT }}
 
       - name: Build and push version-tagged Docker image
+        if: needs.context.outputs.prerelease == 'true'
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ needs.env.outputs.version }}
+          tags: ghcr.io/${{ github.repository }}:${{ needs.context.outputs.version }}
 
       - name: Build and push latest Docker image
-        if: needs.env.outputs.prerelease == 'false'
+        if: needs.context.outputs.prerelease == 'false'
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ needs.context.outputs.major }}
+            ghcr.io/${{ github.repository }}:${{ needs.context.outputs.version }}
