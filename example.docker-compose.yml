@@ -14,7 +14,6 @@ services:
       - TIMEZONE=Europe/Berlin
       - DUO_USERNAME=yourUsername
       - DUO_JWT=yourJWT
-      - SERVER_URL=https://duo.your-domain.com
       - XP_SUMMARY_DAYS=30
       - UPDATE_INTERVAL=15
       - MAX_RETRIES=3

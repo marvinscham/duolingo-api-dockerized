@@ -1,10 +1,16 @@
-import os, json, time, logging, schedule, requests, math
+import json
+import logging
+import os
+import time
 from datetime import datetime
+
+import pytz
+import schedule
+
 import duolingo
 
 duo_user_name = os.getenv("DUO_USERNAME")
 duo_user_jwt = os.getenv("DUO_JWT")
-server_url = os.getenv("SERVER_URL")
 
 timezone = os.getenv("TIMEZONE", "Europe/Berlin")
 xp_summary_days = int(os.getenv("XP_SUMMARY_DAYS", 30))
@@ -19,16 +25,20 @@ handler.setFormatter(
 )
 log.addHandler(handler)
 
-if not duo_user_name or not duo_user_jwt or not server_url:
-    raise KeyError("Incorrect setup: username, jwt or server url missing.")
+if not duo_user_name or not duo_user_jwt:
+    raise KeyError("Incorrect setup: username, jwt missing.")
 
 log.info("I'm alive!")
 
 
-def connectivity_handler():
-    page = requests.get(server_url + "/duo_user_info.json")
-    if page.status_code != 200:
-        log.error("Server cannot be reached.")
+def convert_timestamp(timestamp, timezone):
+    dt = datetime.utcfromtimestamp(timestamp)
+    dt_utc = pytz.utc.localize(dt)
+    tz = pytz.timezone(timezone)
+    dt_local = dt_utc.astimezone(tz)
+
+    formatted_date = dt_local.strftime("%Y-%m-%d %H:%M:%S")
+    return formatted_date
 
 
 def job(retries=max_retries):
@@ -57,16 +67,19 @@ def job(retries=max_retries):
             date_format
         )
 
-        language_progress = duo_user.get_language_progress(learning_language_abbr)
+        language_progress = duo_user.get_language_progress(
+            learning_language_abbr)
 
         streak_info = duo_user.get_streak_info()
 
         xp_summary_start = datetime.fromtimestamp(
             time.time() - (60 * 60 * 24 * (xp_summary_days - 1))
         ).strftime(date_format)
-        xp_summary_end = datetime.fromtimestamp(time.time()).strftime(date_format)
+        xp_summary_end = datetime.fromtimestamp(
+            time.time()).strftime(date_format)
 
         lang_data = duo_user.get_all_languages()
+        timestamp = str(int(time.time()))
 
         user_object = {
             "username": username,
@@ -75,7 +88,7 @@ def job(retries=max_retries):
             "creation_date": user_date_str,
             "learning_language": learning_language_abbr,
             "streak_today": streak_info["streak_extended_today"],
-            "timestamp": str(int(time.time())),
+            "timestamp": timestamp,
             "xp_summary_timezone": timezone,
             "xp_summary_count": xp_summary_days,
             "xp_summary": duo_user.get_xp_summaries(
@@ -95,10 +108,11 @@ def job(retries=max_retries):
             f.write(str_user)
             f.close()
 
-            log.info("Successfully updated info")
+            timestamp_date = convert_timestamp(int(timestamp), timezone)
+            log.info(
+                f"Updated {username}'s info: {user_total_info['totalXp']} XP @ {timestamp_date}")
 
         time.sleep(2)
-        connectivity_handler()
     except Exception as e:
         log.warning(e)
 
@@ -108,7 +122,8 @@ def job(retries=max_retries):
             log.error("Out of retries. Waiting for next execution.")
             return
 
-        log.info("Attempt {}, retrying in 60 seconds".format(max_retries - retries))
+        log.info("Attempt {}, retrying in 60 seconds".format(
+            max_retries - retries))
         time.sleep(60)
         job(retries)
 
