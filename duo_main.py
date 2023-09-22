@@ -80,6 +80,7 @@ def job(retries=max_retries):
 
         lang_data = duo_user.get_all_languages()
         timestamp = str(int(time.time()))
+        timestamp_date = convert_timestamp(int(timestamp), timezone)
 
         user_object = {
             "username": username,
@@ -89,6 +90,7 @@ def job(retries=max_retries):
             "learning_language": learning_language_abbr,
             "streak_today": streak_info["streak_extended_today"],
             "timestamp": timestamp,
+            "timestamp_hr": timestamp_date,
             "xp_summary_timezone": timezone,
             "xp_summary_count": xp_summary_days,
             "xp_summary": duo_user.get_xp_summaries(
@@ -108,7 +110,6 @@ def job(retries=max_retries):
             f.write(str_user)
             f.close()
 
-            timestamp_date = convert_timestamp(int(timestamp), timezone)
             log.info(
                 f"Updated {username}'s info: {user_total_info['totalXp']} XP @ {timestamp_date}")
 
