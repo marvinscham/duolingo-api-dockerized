@@ -9,7 +9,7 @@ import schedule
 
 import duolingo
 
-__version__ = "v2.3.0"
+__version__ = "v2.3.1-beta"
 
 duo_user_name = os.getenv("DUO_USERNAME")
 duo_user_jwt = os.getenv("DUO_JWT")
