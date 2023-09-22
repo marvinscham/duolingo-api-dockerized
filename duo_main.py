@@ -9,6 +9,8 @@ import schedule
 
 import duolingo
 
+__version__ = "v1.3.2"
+
 duo_user_name = os.getenv("DUO_USERNAME")
 duo_user_jwt = os.getenv("DUO_JWT")
 
@@ -29,6 +31,7 @@ if not duo_user_name or not duo_user_jwt:
     raise KeyError("Incorrect setup: username, jwt missing.")
 
 log.info("I'm alive!")
+log.info(f"Running {__version__}")
 
 
 def convert_timestamp(timestamp, timezone):
