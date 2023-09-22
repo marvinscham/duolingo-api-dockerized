@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{steps.version.outputs.version}}
+      major: ${{steps.major.outputs.major}}
       prerelease: ${{steps.prerelease.outputs.prerelease}}
     steps:
       - name: Grab version
