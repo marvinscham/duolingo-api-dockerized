@@ -6,8 +6,6 @@ on:
       - main
       - develop
       - 'release/**'
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
   sonarqube:
