@@ -74,14 +74,14 @@ jobs:
 
       - name: Build and push version-tagged Docker image
         if: needs.context.outputs.prerelease == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ needs.context.outputs.version }}
 
       - name: Build and push latest Docker image
         if: needs.context.outputs.prerelease == 'false'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: |
