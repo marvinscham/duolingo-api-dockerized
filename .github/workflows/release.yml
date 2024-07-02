@@ -42,7 +42,7 @@ jobs:
 
       - name: Build Changelog
         id: changelog
-        uses: mikepenz/release-changelog-builder-action@v3
+        uses: mikepenz/release-changelog-builder-action@v4
         with:
           configuration: '.github/changelog-configuration.json'
         env:
@@ -50,7 +50,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref }}
           name: Release ${{ needs.context.outputs.version }}
@@ -74,14 +74,14 @@ jobs:
 
       - name: Build and push version-tagged Docker image
         if: needs.context.outputs.prerelease == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ needs.context.outputs.version }}
 
       - name: Build and push latest Docker image
         if: needs.context.outputs.prerelease == 'false'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: |
